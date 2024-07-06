@@ -78,7 +78,7 @@ class FollowerManager:
         self.client = client
         self.max_peoples_follow = max_peoples_follow
 
-    def select_valid_users(self, followers, following, condition_follow=True):
+    def select_valid_users(self, followers, following, condition_follow=False):
         valid_users = []
         follower_set = {user['login'] for user in followers}
         following_set = {user['login'] for user in following}
@@ -86,37 +86,49 @@ class FollowerManager:
         common_users = follower_set.intersection(following_set)
 
         print(f"Common users: {common_users}")
+        print(f"Using condition_follow? {condition_follow}")
 
         for user in common_users:
             user_data = self.client.get_user(user)
             num_following = user_data['following']
+
+            check_response = self.is_following(user)
+
+            if check_response.status_code == 204:
+                print(f"Already following {user}")
+                continue  # Skip to the next user
 
             print(f"Checking user: {user}, following count: {num_following}")
 
             if condition_follow:
                 if 2 < num_following < 10 or num_following > 10000:
                     valid_users.append(user_data)
-                    print(f"Added user {user} to valid users.")
+                    print(f"Added user {user} to valid users. (Using condition_follow)")
             else:
                 valid_users.append(user_data)
-                print(f"Added user {user} to valid users.")
+                print(f"Added user {user} to valid users. (Not using condition_follow)")
 
             if len(valid_users) >= self.max_peoples_follow:
                 break
 
         return valid_users
 
+    def is_following(self, username):
+        # Check if already following the user
+        check_following_url = f'https://api.github.com/user/following/{username}'
+        check_response = requests.get(check_following_url, headers=self.client.headers)
+
+        return check_response
+
     def follow_users(self, users):
         for user in users:
             follow_url = f'https://api.github.com/user/following/{user["login"]}'
 
-            # Check if already following the user
-            check_following_url = f'https://api.github.com/user/following/{user["login"]}'
-            check_response = requests.get(check_following_url, headers=self.client.headers)
+            # check_response = self.is_following(user["login"])
 
-            if check_response.status_code == 204:
-                print(f"Already following {user['login']}")
-                continue  # Skip to the next user
+            # if check_response.status_code == 204:
+            #     print(f"Already following {user['login']}")
+            #     continue  # Skip to the next user
 
             # Follow the user
             response = self.client._make_request_follow('PUT', follow_url)
