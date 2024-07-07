@@ -43,7 +43,7 @@ class GitHubClientFollow:
         return data
 
     def _make_request_follow(self, method, url):
-        max_retries = 1
+        max_retries = 3
         retry_delay = 2  # Initial delay in seconds
 
         for attempt in range(max_retries):
