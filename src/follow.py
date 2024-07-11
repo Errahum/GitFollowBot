@@ -1,3 +1,4 @@
+import json
 import time
 import requests
 
@@ -74,9 +75,10 @@ class GitHubClientFollow:
 
 
 class FollowerManager:
-    def __init__(self, client, max_peoples_follow):
+    def __init__(self, client, max_peoples_follow, jsonl_file):
         self.client = client
         self.max_peoples_follow = max_peoples_follow
+        self.jsonl_file = jsonl_file
 
     def select_valid_users(self, followers, following, condition_follow=False):
         valid_users = []
@@ -92,6 +94,10 @@ class FollowerManager:
             user_data = self.client.get_user(user)
             num_following = user_data['following']
 
+            if self.is_in_jsonl(user):
+                print(f"{user} is already in JSONL file, skipping follow.")
+                continue
+
             check_response = self.is_following(user)
 
             if check_response.status_code == 204:
@@ -103,10 +109,10 @@ class FollowerManager:
             if condition_follow:
                 if 2 < num_following < 10 or num_following > 10000:
                     valid_users.append(user_data)
-                    print(f"Added user {user} to valid users. (Using condition_follow)")
+                    print(f"Added user {user} to valid users.")
             else:
                 valid_users.append(user_data)
-                print(f"Added user {user} to valid users. (Not using condition_follow)")
+                print(f"Added user {user} to valid users.")
 
             if len(valid_users) >= self.max_peoples_follow:
                 break
@@ -120,15 +126,18 @@ class FollowerManager:
 
         return check_response
 
+    def is_in_jsonl(self, username):
+        # Check if username is already in JSONL file
+        with open(self.jsonl_file, 'r') as file:
+            for line in file:
+                data = json.loads(line.strip())
+                if data == username:
+                    return True
+        return False
+
     def follow_users(self, users):
         for user in users:
             follow_url = f'https://api.github.com/user/following/{user["login"]}'
-
-            # check_response = self.is_following(user["login"])
-
-            # if check_response.status_code == 204:
-            #     print(f"Already following {user['login']}")
-            #     continue  # Skip to the next user
 
             # Follow the user
             response = self.client._make_request_follow('PUT', follow_url)
