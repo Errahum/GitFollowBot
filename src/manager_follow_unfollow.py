@@ -1,6 +1,7 @@
 import json
 
 from src.follow import GitHubClientFollow, FollowerManager, extract_username_from_url
+from src.follow_back import GitHubClientFollowBack, FollowBackFollowers
 from src.get_following import GitHubClientGetFollowings
 from src.unfollow import UnfollowNonFollowers, GitHubClientUnfollow
 
@@ -10,6 +11,7 @@ class MainFollowUnfollow:
         self.github_client_follow = GitHubClientFollow(config)
         self.github_client_unfollow = GitHubClientUnfollow(config)
         self.github_client_get_following = GitHubClientGetFollowings(config)
+        self.github_client_follow_back = GitHubClientFollowBack(config)
 
     def follow_people(self):
         profile_url = input("Enter the GitHub profile URL: ")
@@ -58,3 +60,9 @@ class MainFollowUnfollow:
         unfollow_manager.unfollow_non_followers()
 
         print("Process complete.")
+
+    def follow_back(self):
+        username = input("Enter your GitHub username: ")
+
+        follow_back_bot = FollowBackFollowers(self.github_client_follow_back, username)
+        follow_back_bot.follow_back()
