@@ -9,7 +9,7 @@ class MainFollowUnfollow:
     def __init__(self, config):
         self.github_client_follow = GitHubClientFollow(config)
         self.github_client_unfollow = GitHubClientUnfollow(config)
-        self.github_client = GitHubClientGetFollowings(config)
+        self.github_client_get_following = GitHubClientGetFollowings(config)
 
     def follow_people(self):
         profile_url = input("Enter the GitHub profile URL: ")
@@ -23,7 +23,7 @@ class MainFollowUnfollow:
             condition_follow = False
 
         username = input("Enter your GitHub username: ")
-        followings = self.github_client.get_following(username)
+        followings = self.github_client_get_following.get_following(username)
         jsonl_file = "followings.jsonl"
 
         with open(jsonl_file, 'w') as f:

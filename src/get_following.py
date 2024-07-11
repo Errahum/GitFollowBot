@@ -1,7 +1,4 @@
 import requests
-import json
-
-from config import Config
 
 
 class GitHubClientGetFollowings:
@@ -50,22 +47,3 @@ class GitHubClientGetFollowings:
         except requests.RequestException as e:
             print(f"Request to {url} failed: {e}")
             raise
-
-
-# def main():
-#     config = Config()  # Remplacez par votre configuration pour récupérer la clé API
-#     github_client = GitHubClientGetFollowings(config)
-#     username = 'Sahurows'  # Remplacez par votre propre username
-#
-#     followings = github_client.get_following(username)
-#
-#     with open('followings.jsonl', 'w') as jsonl_file:
-#         for following in followings:
-#             json.dump(following['login'], jsonl_file)
-#             jsonl_file.write('\n')
-#
-#     print(f"Usernames des personnes que vous suivez ont été enregistrés dans 'followings.jsonl'.")
-#
-#
-# if __name__ == "__main__":
-#     main()
