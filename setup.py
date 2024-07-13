@@ -3,11 +3,11 @@ from setuptools import setup, find_packages
 setup(
     name='GitFollowBot',
     version='1.0.0',
-    author='sahurows',
+    author='sariteos',
     description='A bot to follow and unfollow',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/Sahurows/GitFollowBot',
+    url='https://github.com/sariteos/GitFollowBot',
     packages=find_packages(),
     install_requires=[
         'time',
