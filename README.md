@@ -100,4 +100,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 If you find this project helpful, consider supporting us with a donation to help maintain and improve the project. Thank you!
 
-[![learning_application](https://i.imgur.com/abEFO5o.png)](https://buymeacoffee.com/sariteos)
+[![learning_application](https://i.imgur.com/abEFO5o.png)](https://buymeacoffee.com/Errahum)
