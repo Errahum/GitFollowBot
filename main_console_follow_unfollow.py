@@ -1,5 +1,6 @@
 from config import Config
 from src.manager_follow_unfollow import MainFollowUnfollow
+from src.utils.logger import logger
 
 
 def main_console_follow_unfollow():
@@ -7,11 +8,11 @@ def main_console_follow_unfollow():
 
     main_app = MainFollowUnfollow(config)
     while True:
-        print("\nChoose an action:")
-        print("1. Follow people")
-        print("2. Unfollow people")
-        print("3. Follow back people")
-        print("4. Exit")
+        logger.info("\nChoose an action:")
+        logger.info("1. Follow people")
+        logger.info("2. Unfollow people")
+        logger.info("3. Follow back people")
+        logger.info("4. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -22,10 +23,10 @@ def main_console_follow_unfollow():
         elif choice == '3':
             main_app.follow_back()
         elif choice == '4':
-            print("Exiting the program.")
+            logger.info("Exiting the program.")
             break
         else:
-            print("Invalid choice. Please enter 1, 2, 3 or 4.")
+            logger.warning("Invalid choice. Please enter 1, 2, 3 or 4.")
 
 
 if __name__ == "__main__":

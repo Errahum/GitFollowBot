@@ -1,20 +1,23 @@
 import time
+from src.utils.logger import logger
 import requests
 
 
 class GitHubClientUnfollow:
-    def __init__(self, config):
+    def __init__(self, config, username):
         self.token = config.get_api_key()
         self.headers = {
             'Authorization': f'token {self.token}',
             'Accept': 'application/vnd.github.v3+json'
         }
+        self.username = username
 
-    def get_following(self, username):
-        return self._get_paginated_data(f'https://api.github.com/users/{username}/following')
 
-    def get_followers(self, username):
-        return self._get_paginated_data(f'https://api.github.com/users/{username}/followers')
+    def get_following(self):
+        return self._get_paginated_data(f'https://api.github.com/users/{self.username}/following')
+
+    def get_followers(self):
+        return self._get_paginated_data(f'https://api.github.com/users/{self.username}/followers')
 
     def _get_paginated_data(self, url):
         page = 1
@@ -47,13 +50,13 @@ class GitHubClientUnfollow:
                     raise ValueError("Unsupported HTTP method")
 
                 if response.status_code == 500:
-                    print(f"Server error (500) at {url}, retrying...")
+                    logger.error(f"Server error (500) at {url}, retrying...")
                     time.sleep(2)  # Wait before retrying
                     continue  # Retry the request
 
                 return response
             except requests.RequestException as e:
-                print(f"Request to {url} failed: {e}")
+                logger.error(f"Request to {url} failed: {e}")
                 if attempt < max_retries - 1:
                     time.sleep(2)  # Wait before retrying
                     continue  # Retry the request
@@ -62,18 +65,17 @@ class GitHubClientUnfollow:
 
 
 class UnfollowNonFollowers:
-    def __init__(self, client, username, max_peoples_unfollow):
+    def __init__(self, client, username):
         self.client = client
         self.username = username
-        self.max_peoples_unfollow = max_peoples_unfollow
 
-    def unfollow_non_followers(self):
-        following = self.client.get_following(self.username)
-        followers = self.client.get_followers(self.username)
+    def unfollow_non_followers(self, max_peoples_unfollow):
+        following = self.client.get_following()
+        followers = self.client.get_followers()
 
         follower_set = {user['login'] for user in followers}
         unfollow_count = 0
-        unfollow_limit = self.max_peoples_unfollow
+        unfollow_limit = max_peoples_unfollow
 
         for user in following:
             if user['login'] not in follower_set:
@@ -81,11 +83,11 @@ class UnfollowNonFollowers:
                 response = self.client._make_request_unfollow('DELETE', unfollow_url)
 
                 if response.status_code == 204:
-                    print(f"Successfully unfollowed {user['login']}")
+                    logger.info(f"Successfully unfollowed {user['login']}")
                     unfollow_count += 1
                 else:
-                    print(f"Failed to unfollow {user['login']} with status code {response.status_code}")
+                    logger.error(f"Failed to unfollow {user['login']} with status code {response.status_code}")
 
                 if unfollow_count >= unfollow_limit:
-                    print(f"Reached the unfollow limit of {self.max_peoples_unfollow} users")
+                    logger.warning(f"Reached the unfollow limit of {max_peoples_unfollow} users")
                     break

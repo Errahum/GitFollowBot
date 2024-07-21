@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='GitFollowBot',
-    version='1.0.0',
+    version='1.0.3',
     author='Errahum',
     description='A bot to follow and unfollow',
     long_description=open('README.md').read(),

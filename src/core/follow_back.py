@@ -1,6 +1,6 @@
 import time
 import requests
-
+from src.utils.logger import logger
 
 class GitHubClientFollowBack:
     def __init__(self, config):
@@ -52,13 +52,13 @@ class GitHubClientFollowBack:
                     raise ValueError("Unsupported HTTP method")
 
                 if response.status_code == 500:
-                    print(f"Server error (500) at {url}, retrying...")
+                    logger.error(f"Server error (500) at {url}, retrying...")
                     time.sleep(2)  # Wait before retrying
                     continue  # Retry the request
 
                 return response
             except requests.RequestException as e:
-                print(f"Request to {url} failed: {e}")
+                logger.error(f"Request to {url} failed: {e}")
                 if attempt < max_retries - 1:
                     time.sleep(2)  # Wait before retrying
                     continue  # Retry the request
@@ -71,6 +71,17 @@ class FollowBackFollowers:
         self.client = client
         self.username = username
 
+    def follow_back_periodically(self):
+        while True:
+            try:
+                self.follow_back()
+                time.sleep(120)  # Wait for 2 minutes before checking again
+                logger.info("2 minutes after retry")
+            except Exception as e:
+                logger.error(f"An error occurred: {str(e)}")
+                time.sleep(60)  # Wait for 1 minute before retrying
+                logger.info("1 minute after retry")
+
     def follow_back(self):
         followers = self.client.get_followers(self.username)
         following = self.client.get_following(self.username)
@@ -81,6 +92,6 @@ class FollowBackFollowers:
             if user['login'] not in following_set:
                 success = self.client.follow_user(user['login'])
                 if success:
-                    print(f"Successfully followed back {user['login']}")
+                    logger.info(f"Successfully followed back {user['login']}")
                 else:
-                    print(f"Failed to follow back {user['login']}")
+                    logger.error(f"Failed to follow back {user['login']}")
