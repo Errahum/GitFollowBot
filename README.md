@@ -85,6 +85,7 @@ if __name__ == "__main__":
 
 ## Contribute
 
+Please contact me before contributing.
 Contributions are always welcome! Please follow these steps:
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature-branch`).
