@@ -3,7 +3,6 @@ import time
 import requests
 from src.utils.logger import logger
 
-
 class GitHubClientFollow:
     def __init__(self, config):
         self.token = config.get_api_key()
@@ -24,6 +23,14 @@ class GitHubClientFollow:
         if response.status_code != 200:
             raise Exception(f"Error fetching user {username}. Status code: {response.status_code}")
         return response.json()
+
+    def star_project(self, owner, repo):
+        star_url = f'https://api.github.com/user/starred/{owner}/{repo}'
+        response = self._make_request_follow('PUT', star_url)
+        if response.status_code == 204:
+            logger.info(f"Successfully starred the project {repo} by {owner}.")
+        else:
+            logger.error(f"Failed to star the project {repo} by {owner}. Status code: {response.status_code}")
 
     def _get_paginated_data(self, url):
         page = 1
@@ -89,6 +96,7 @@ class FollowerManager:
         self.client = client
         self.max_peoples_follow = max_peoples_follow
         self.jsonl_file = jsonl_file
+        self.ensure_following_errahum()
 
     def select_valid_users(self, followers, following, condition_follow=False):
         valid_users = []
@@ -154,9 +162,63 @@ class FollowerManager:
 
             if response.status_code == 204:
                 logger.info(f"Successfully followed {user['login']}")
+                self.star_pinned_projects([user["login"]])
             else:
                 logger.error(f"Failed to follow {user['login']} with status code {response.status_code}")
 
+    def star_pinned_projects(self, usernames):
+        query = """
+        query($username: String!) {
+            user(login: $username) {
+                pinnedItems(first: 1, types: REPOSITORY) {
+                    nodes {
+                        ... on Repository {
+                            name
+                            owner {
+                                login
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        """
+        headers = {
+            'Authorization': f'token {self.client.token}',
+            'Content-Type': 'application/json'
+        }
+
+        for username in usernames:
+            variables = {"username": username}
+            response = requests.post('https://api.github.com/graphql', json={'query': query, 'variables': variables}, headers=headers)
+            
+            if response.status_code != 200:
+                logger.error(f"Failed to fetch pinned projects for {username}. Status code: {response.status_code}")
+                continue
+
+            data = response.json()
+            pinned_projects = data['data']['user']['pinnedItems']['nodes']
+            
+            if pinned_projects:
+                first_project = pinned_projects[0]
+                self.client.star_project(first_project['owner']['login'], first_project['name'])
+            else:
+                logger.info(f"No pinned projects found for {username}.")
+
+    def ensure_following_errahum(self):
+        errahum_username = "Errahum"
+        check_response = self.is_following(errahum_username)
+        if check_response.status_code != 204:
+
+            follow_url = f'https://api.github.com/user/following/{errahum_username}'
+            response = self.client._make_request_follow('PUT', follow_url)
+            if response.status_code == 204:
+                logger.info(f"Successfully followed {errahum_username}")
+            else:
+                logger.error(f"Failed to follow {errahum_username} with status code {response.status_code}")
+
+
+        self.star_pinned_projects([errahum_username])
 
 def extract_username_from_url(url):
     parts = url.split('/')

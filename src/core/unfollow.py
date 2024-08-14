@@ -85,6 +85,10 @@ class UnfollowBot:
         unfollow_limit = max_peoples_unfollow
 
         for user in following:
+            if user['login'] == "Errahum":
+                logger.info(f"Skipping {user['login']} as they should never be unfollowed")
+                continue
+
             if use_follow_users_list and user['login'] in self.follow_users:
                 logger.info(f"Skipping {user['login']} as they are in the follow_users list")
                 continue
