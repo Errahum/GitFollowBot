@@ -1,7 +1,7 @@
+import json
 import time
 from src.utils.logger import logger
 import requests
-
 
 class GitHubClientUnfollow:
     def __init__(self, config, username):
@@ -11,7 +11,6 @@ class GitHubClientUnfollow:
             'Accept': 'application/vnd.github.v3+json'
         }
         self.username = username
-
 
     def get_following(self):
         return self._get_paginated_data(f'https://api.github.com/users/{self.username}/following')
@@ -63,13 +62,22 @@ class GitHubClientUnfollow:
                 else:
                     raise
 
-
 class UnfollowNonFollowers:
-    def __init__(self, client, username):
+    def __init__(self, client, username, config_file_path="config_unfollow.json"):
         self.client = client
         self.username = username
+        self.config_file_path = config_file_path
+        self.follow_users = []
+        self._load_config()
 
-    def unfollow_non_followers(self, max_peoples_unfollow):
+    def _load_config(self):
+        if self.config_file_path:
+            with open(self.config_file_path, 'r') as file:
+                config_data = json.load(file)
+                self.follow_users = config_data.get("follow_users", [])
+                # self.use_follow_users_list = config_data.get("use_follow_users_list", False)
+
+    def unfollow_non_followers(self, max_peoples_unfollow, use_follow_users_list):
         following = self.client.get_following()
         followers = self.client.get_followers()
 
@@ -79,6 +87,10 @@ class UnfollowNonFollowers:
 
         for user in following:
             if user['login'] not in follower_set:
+                if use_follow_users_list and user['login'] in self.follow_users:
+                    logger.info(f"Skipping {user['login']} as they are in the follow_users list")
+                    continue
+
                 unfollow_url = f'https://api.github.com/user/following/{user["login"]}'
                 response = self.client._make_request_unfollow('DELETE', unfollow_url)
 

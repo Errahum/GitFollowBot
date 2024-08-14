@@ -5,6 +5,7 @@ from src.core.follow_back import GitHubClientFollowBack, FollowBackFollowers
 from src.core.get_following import GitHubClientGetFollowings
 from src.core.unfollow import UnfollowNonFollowers, GitHubClientUnfollow
 from src.utils.logger import logger
+from src.core.linkedin import GitHubLinkedInScraper
 
 class MainFollowUnfollow:
     def __init__(self, config):
@@ -17,19 +18,20 @@ class MainFollowUnfollow:
         self.github_client_get_following = GitHubClientGetFollowings(config)
         self.github_client_follow_back = GitHubClientFollowBack(config)
         self.github_client_unfollow_not_follow = UnfollowNonFollowers(self.github_client_unfollow, self.username)
+        self.linkedin_scraper = GitHubLinkedInScraper(config, max_accounts=0)
 
     def follow_people(self):
         profile_url = input("Enter the GitHub profile URL: ")
         max_peoples_follow = int(input("Enter the maximum number of people to follow: "))
         condition_follow = False
-        condition_input = input("Enter 't' or 'f' for restrictive conditions: ").strip().lower()
+        # condition_input = input("Enter 't' or 'f' for restrictive conditions: ").strip().lower()
         target_username = None
         jsonl_file = None
 
-        if condition_input == 't':
-            condition_follow = True
-        elif condition_input == 'f':
-            condition_follow = False
+        # if condition_input == 't':
+            # condition_follow = True
+        # elif condition_input == 'f':
+            # condition_follow = False
 
         try:
             followings = self.github_client_get_following.get_following()
@@ -65,8 +67,16 @@ class MainFollowUnfollow:
 
         max_peoples_follow = int(input("Enter the maximum number of people to unfollow: "))
 
+        use_follow_users_list = False
+        condition_input_unfollow = input("Enter 't' or 'f' for restrictive conditions: ").strip().lower()
+
+        if condition_input_unfollow == 't':
+            use_follow_users_list = True
+        elif condition_input_unfollow == 'f':
+            use_follow_users_list = False
+
         unfollow_manager = self.github_client_unfollow_not_follow
-        unfollow_manager.unfollow_non_followers(max_peoples_follow)
+        unfollow_manager.unfollow_non_followers(max_peoples_follow, use_follow_users_list)
 
         logger.info("Process complete.")
 
@@ -78,4 +88,10 @@ class MainFollowUnfollow:
         elif condition_input == 'f':
             follow_back_bot.follow_back()
 
-
+    def linkedin_profiles(self):
+        max_accounts = int(input("Enter the maximum number of linkedin account: "))
+        if max_accounts <= 0:
+            logger.error("Invalid number of accounts.")
+        else:
+            followers = self.linkedin_scraper.get_github_followers(self.username, max_accounts)
+            self.linkedin_scraper.scrape_linkedin_profiles(followers)

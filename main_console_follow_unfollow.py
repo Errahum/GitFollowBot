@@ -12,7 +12,8 @@ def main_console_follow_unfollow():
         logger.info("1. Follow people")
         logger.info("2. Unfollow people")
         logger.info("3. Follow back people")
-        logger.info("4. Exit")
+        logger.info("4. Linkedin profiles")
+        logger.info("5. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -23,6 +24,8 @@ def main_console_follow_unfollow():
         elif choice == '3':
             main_app.follow_back()
         elif choice == '4':
+            main_app.linkedin_profiles()
+        elif choice == '5':
             logger.info("Exiting the program.")
             break
         else:
