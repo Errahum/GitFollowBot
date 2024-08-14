@@ -62,7 +62,7 @@ class GitHubClientUnfollow:
                 else:
                     raise
 
-class UnfollowNonFollowers:
+class UnfollowBot:
     def __init__(self, client, username, config_file_path="config_unfollow.json"):
         self.client = client
         self.username = username
@@ -75,7 +75,6 @@ class UnfollowNonFollowers:
             with open(self.config_file_path, 'r') as file:
                 config_data = json.load(file)
                 self.follow_users = config_data.get("follow_users", [])
-                # self.use_follow_users_list = config_data.get("use_follow_users_list", False)
 
     def unfollow_non_followers(self, max_peoples_unfollow, use_follow_users_list):
         following = self.client.get_following()
@@ -86,20 +85,27 @@ class UnfollowNonFollowers:
         unfollow_limit = max_peoples_unfollow
 
         for user in following:
-            if user['login'] not in follower_set:
-                if use_follow_users_list and user['login'] in self.follow_users:
-                    logger.info(f"Skipping {user['login']} as they are in the follow_users list")
-                    continue
+            if use_follow_users_list and user['login'] in self.follow_users:
+                logger.info(f"Skipping {user['login']} as they are in the follow_users list")
+                continue
 
-                unfollow_url = f'https://api.github.com/user/following/{user["login"]}'
-                response = self.client._make_request_unfollow('DELETE', unfollow_url)
+            if not use_follow_users_list and user['login'] in follower_set:
+                continue
 
-                if response.status_code == 204:
-                    logger.info(f"Successfully unfollowed {user['login']}")
-                    unfollow_count += 1
-                else:
-                    logger.error(f"Failed to unfollow {user['login']} with status code {response.status_code}")
+            if self.unfollow_user(user):
+                unfollow_count += 1
 
-                if unfollow_count >= unfollow_limit:
-                    logger.warning(f"Reached the unfollow limit of {max_peoples_unfollow} users")
-                    break
+            if unfollow_count >= unfollow_limit:
+                logger.warning(f"Reached the unfollow limit of {max_peoples_unfollow} users")
+                break
+
+    def unfollow_user(self, user):
+        unfollow_url = f'https://api.github.com/user/following/{user["login"]}'
+        response = self.client._make_request_unfollow('DELETE', unfollow_url)
+
+        if response.status_code == 204:
+            logger.info(f"Successfully unfollowed {user['login']}")
+            return True
+        else:
+            logger.error(f"Failed to unfollow {user['login']} with status code {response.status_code}")
+            return False

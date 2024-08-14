@@ -7,8 +7,11 @@ Added support for linkedin gtihub linkedin accounts.
 <img src="https://i.imgur.com/4qOsG3m.gif" width="350"></a>
 
 ### **Disclaimer**
- The use of GitFollowBot to automate GitHub actions such as following and unfollowing users should comply with [GitHub's terms of service](https://docs.github.com/en/github/site-policy/github-terms-of-service). Automated actions may affect your GitHub account's standing if used excessively or in violation of [GitHub's guidelines](https://docs.github.com/en/github/site-policy/github-acceptable-use-policies). Use GitFollowBot responsibly.
+The use of GitFollowBot to automate GitHub actions such as following and unfollowing users should comply with [GitHub's terms of service](https://docs.github.com/en/github/site-policy/github-terms-of-service). Automated actions may affect your GitHub account's standing if used excessively or in violation of [GitHub's guidelines](https://docs.github.com/en/github/site-policy/github-acceptable-use-policies). Use GitFollowBot responsibly.
 For Linkedin, you need to use my tools carefully to avoid having your account blocked.
+
+**Important:** By using GitFollowBot, you agree to adhere to the terms of service of both GitHub and LinkedIn. Misuse of this tool can lead to your account being suspended or banned. Always ensure that your actions are within the acceptable use policies of these platforms.
+
 
 ## Table of Contents
 

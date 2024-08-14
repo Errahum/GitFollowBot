@@ -3,7 +3,7 @@ import json
 from src.core.follow import GitHubClientFollow, FollowerManager, extract_username_from_url
 from src.core.follow_back import GitHubClientFollowBack, FollowBackFollowers
 from src.core.get_following import GitHubClientGetFollowings
-from src.core.unfollow import UnfollowNonFollowers, GitHubClientUnfollow
+from src.core.unfollow import UnfollowBot, GitHubClientUnfollow
 from src.utils.logger import logger
 from src.core.linkedin import GitHubLinkedInScraper
 
@@ -17,7 +17,7 @@ class MainFollowUnfollow:
         self.github_client_unfollow = GitHubClientUnfollow(config, self.username)
         self.github_client_get_following = GitHubClientGetFollowings(config)
         self.github_client_follow_back = GitHubClientFollowBack(config)
-        self.github_client_unfollow_not_follow = UnfollowNonFollowers(self.github_client_unfollow, self.username)
+        self.github_client_unfollow = UnfollowBot(self.github_client_unfollow, self.username)
         self.linkedin_scraper = GitHubLinkedInScraper(config, max_accounts=0)
 
     def follow_people(self):
@@ -75,7 +75,7 @@ class MainFollowUnfollow:
         elif condition_input_unfollow == 'f':
             use_follow_users_list = False
 
-        unfollow_manager = self.github_client_unfollow_not_follow
+        unfollow_manager = self.github_client_unfollow
         unfollow_manager.unfollow_non_followers(max_peoples_follow, use_follow_users_list)
 
         logger.info("Process complete.")
