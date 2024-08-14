@@ -109,3 +109,4 @@ class UnfollowBot:
         else:
             logger.error(f"Failed to unfollow {user['login']} with status code {response.status_code}")
             return False
+        

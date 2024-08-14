@@ -24,14 +24,8 @@ class MainFollowUnfollow:
         profile_url = input("Enter the GitHub profile URL: ")
         max_peoples_follow = int(input("Enter the maximum number of people to follow: "))
         condition_follow = False
-        # condition_input = input("Enter 't' or 'f' for restrictive conditions: ").strip().lower()
         target_username = None
         jsonl_file = None
-
-        # if condition_input == 't':
-            # condition_follow = True
-        # elif condition_input == 'f':
-            # condition_follow = False
 
         try:
             followings = self.github_client_get_following.get_following()
