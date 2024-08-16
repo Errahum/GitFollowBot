@@ -10,6 +10,14 @@ class GitHubClientFollow:
             'Authorization': f'token {self.token}',
             'Accept': 'application/vnd.github.v3+json'
         }
+        self.authenticated_user = self.get_authenticated_user()
+
+    def get_authenticated_user(self):
+        user_url = 'https://api.github.com/user'
+        response = self._make_request_follow('GET', user_url)
+        if response.status_code != 200:
+            raise Exception(f"Error fetching authenticated user. Status code: {response.status_code}")
+        return response.json()['login']
 
     def get_followers(self, username):
         return self._get_paginated_data(f'https://api.github.com/users/{username}/followers')
@@ -109,6 +117,10 @@ class FollowerManager:
         logger.info(f"Using condition_follow? {condition_follow}")
 
         for user in common_users:
+            if user == self.client.authenticated_user:
+                logger.info(f"Skipping self: {user}")
+                continue
+
             user_data = self.client.get_user(user)
             num_following = user_data['following']
 
