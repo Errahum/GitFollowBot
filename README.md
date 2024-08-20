@@ -3,7 +3,8 @@
 GitFollowBot is an automation tool designed to manage your GitHub following and followers efficiently. With GitFollowBot, you can automatically follow users based on specific criteria and unfollow users who do not follow you back. This project aims to simplify the process of growing and managing your GitHub network.
 Added support for gtihub accounts linked to Linkedin.
 
-<img src="https://i.imgur.com/4qOsG3m.gif" width="350"></a>
+### Video
+[![Alt text](https://i.imgur.com/4qOsG3m.gif)](https://www.youtube.com/watch?v=yXn_ygUheTE)
 
 ### **Disclaimer**
 The use of GitFollowBot to automate GitHub actions such as following and unfollowing users should comply with [GitHub's terms of service](https://docs.github.com/en/github/site-policy/github-terms-of-service). Automated actions may affect your GitHub account's standing if used excessively or in violation of [GitHub's guidelines](https://docs.github.com/en/github/site-policy/github-acceptable-use-policies). Use GitFollowBot responsibly.
