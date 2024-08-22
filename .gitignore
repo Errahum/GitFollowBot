@@ -169,3 +169,8 @@ __pycache__
 job_ids.txt
 
 followings.jsonl
+X_profiles.jsonl
+linkedin_profiles.jsonl
+github_usernames.txt
+config_unfollow.json
+config_unfollow.json

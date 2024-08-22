@@ -42,26 +42,6 @@ class GitHubLinkedInScraper:
 
         return data
 
-    def _extract_linkedin_profiles(self, followers):
-        linkedin_profiles = []
-        if followers is None:
-            logger.error("Followers list is None, cannot scrape LinkedIn profiles.")
-            return linkedin_profiles
-
-        for follower in followers:
-            if follower is None:
-                logger.warning("Encountered None follower, skipping.")
-                continue
-
-            social_accounts_url = f"https://api.github.com/users/{follower['login']}/social_accounts"
-            response = self._make_request('GET', social_accounts_url)
-            if response.status_code == 200:
-                social_accounts = response.json()
-                linkedin_url = next((account['url'] for account in social_accounts if 'linkedin.com' in account['url']), None)
-                if linkedin_url:
-                    linkedin_profiles.append({'github_username': follower['login'], 'linkedin_url': linkedin_url})
-        return linkedin_profiles
-
     def _update_jsonl_file(self, linkedin_profiles):
         valid_profiles = [profile for profile in linkedin_profiles if self._is_valid_linkedin(profile['linkedin_url'])]
         with open(self.jsonl_file, 'w') as file:

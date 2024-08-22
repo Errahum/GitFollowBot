@@ -1,11 +1,14 @@
 import json
 
-from src.core.follow import GitHubClientFollow, FollowerManager, extract_username_from_url
-from src.core.follow_back import GitHubClientFollowBack, FollowBackFollowers
-from src.core.get_following import GitHubClientGetFollowings
-from src.core.unfollow import UnfollowBot, GitHubClientUnfollow
+from src.core.follow.follow import GitHubClientFollow, FollowerManager, extract_username_from_url
+from src.core.follow.follow_back import GitHubClientFollowBack, FollowBackFollowers
+from src.core.follow.get_following import GitHubClientGetFollowings
+from src.core.undo.unfollow import UnfollowBot, GitHubClientUnfollow
 from src.utils.logger import logger
-from src.core.linkedin import GitHubLinkedInScraper
+from src.core.scrapper.linkedin import GitHubLinkedInScraper
+from src.core.scrapper.x import XScraper
+from src.core.undo.unstar import GitHubClientUnstar
+
 
 class MainFollowUnfollow:
     def __init__(self, config):
@@ -19,6 +22,8 @@ class MainFollowUnfollow:
         self.github_client_follow_back = GitHubClientFollowBack(config)
         self.github_client_unfollow = UnfollowBot(self.github_client_unfollow, self.username)
         self.linkedin_scraper = GitHubLinkedInScraper(config, max_accounts=0)
+        self.x_scraper = XScraper(config, max_accounts=0)
+        self.GitHubClientUnstar = GitHubClientUnstar(config, self.username)
 
     def follow_people(self):
         profile_url = input("Enter the GitHub profile URL: ")
@@ -89,3 +94,15 @@ class MainFollowUnfollow:
         else:
             followers = self.linkedin_scraper.get_github_followers(self.username, max_accounts)
             self.linkedin_scraper.scrape_linkedin_profiles(followers)
+
+    def x_profiles(self):
+        max_accounts = int(input("Enter the maximum number of X accounts: "))
+        if max_accounts <= 0:
+            logger.error("Invalid number of accounts.")
+        else:
+            followers = self.x_scraper.get_github_followers(self.username, max_accounts)
+            self.x_scraper.scrape_X_profiles(followers)
+
+    def unstar_non_followers_repos(self):
+        self.GitHubClientUnstar.unstar_non_followers_repos()
+        logger.info("Unstar process complete.")
