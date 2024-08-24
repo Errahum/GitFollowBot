@@ -5,8 +5,8 @@ from src.core.follow.follow_back import GitHubClientFollowBack, FollowBackFollow
 from src.core.follow.get_following import GitHubClientGetFollowings
 from src.core.undo.unfollow import UnfollowBot, GitHubClientUnfollow
 from src.utils.logger import logger
-from src.core.scrapper.linkedin import GitHubLinkedInScraper
-from src.core.scrapper.x import XScraper
+from src.core.scraper.linkedin import GitHubLinkedInScraper
+from src.core.scraper.x import XScraper
 from src.core.undo.unstar import GitHubClientUnstar
 
 
